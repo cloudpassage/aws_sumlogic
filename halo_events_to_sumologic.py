@@ -12,8 +12,8 @@ class LambdaHandler():
     def __init__(self):
         self.sumo_url = os.environ['sumologic_https_url']
         self.halo_api_key_id = os.environ['halo_api_key_id']
-        self.halo_api_secret = os.environ['halo_api_secret']
-        self.api_hostname = os.environ['halo_api_hostname']
+        self.halo_api_secret_key = os.environ['halo_api_secret_key']
+        self.halo_api_endpoint = os.environ['halo_api_endpoint']
         self.aws_region_name = os.environ['aws_region_name']
         self.max_retry = 3
         self.client = boto3.client('sqs', region_name=self.aws_region_name)
@@ -21,7 +21,7 @@ class LambdaHandler():
         self.timestamp_queue = 'halo_last_time_ran-test'
 
     def pull_halo_events(self, since, until):
-        session = cloudpassage.HaloSession(self.halo_api_key, self.halo_api_secret, api_host=self.halo_api_endpoint)
+        session = cloudpassage.HaloSession(self.halo_api_key_id, self.halo_api_secret_key, api_host=self.halo_api_endpoint)
         events = cloudpassage.Event(session)
         list_of_events = events.list_all(pages=50, since=since, until=until)
         return list_of_events
@@ -63,10 +63,10 @@ class LambdaHandler():
         return self.current_time
 
 
-def main():
+def main(event, context):
     print('[CloudPassage Halo Events] Loading Lambda function - Get Since & Until timestamps')
     lambda_handler = LambdaHandler()
-    lambda_handler.run()
+    lambda_handler.run('event', 'context')
 
-if __name__ == "__mian__":
-    main()
+if __name__ == "__main__":
+    main('event', 'context')

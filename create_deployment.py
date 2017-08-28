@@ -3,7 +3,7 @@ import subprocess
 import zipfile
 
 root_deployments_dir = "./deployments"
-deployment_files = ['halo_events_to_sumologic.py', 'sumologic_https.py']
+deployment_files = ['halo_events_to_sumologic.py', 'queue_utility.py', 'sumologic_https.py']
 
 def _read_requirements():
     with open("./requirements.txt", 'r') as f:
