@@ -20,15 +20,15 @@ class LambdaHandler():
         self.current_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         self.timestamp_queue = 'halo_last_time_ran-test'
 
-    def pull_halo_events(halo_api_key, halo_api_secret, halo_api_endpoint since, until):
-        session = cloudpassage.HaloSession(halo_api_key, halo_api_secret, api_host=halo_api_endpoint)
+    def pull_halo_events(self, since, until):
+        session = cloudpassage.HaloSession(self.halo_api_key, self.halo_api_secret, api_host=self.halo_api_endpoint)
         events = cloudpassage.Event(session)
-        list_of_events=events.list_all(pages=50, since=since, until=until)
+        list_of_events = events.list_all(pages=50, since=since, until=until)
         return list_of_events
 
-    def lambda_handler(event, context):
+    def run(self, event, context):
         try:
-            response = self.client.get_queue_url(QueueName=timestamp_queue)
+            response = self.client.get_queue_url(QueueName=self.timestamp_queue)
             queue_url = response['QueueUrl']
             print ('[lambda_handler] Queue found (Queue URL: %s)' % queue_url)
             response = q.dequeue(self.client, queue_url=queue_url)
@@ -36,15 +36,14 @@ class LambdaHandler():
             receipt_handle = response['Messages'][0]['ReceiptHandle']
             print ('[lambda_handler] Since = %s\n[lambda_handler] Until = %s' % (since, self.current_time))
 
-            list_of_events = pull_halo_events(halo_api_key_id, halo_api_secret,
-                                              halo_api_endpoint, since, until)
+            list_of_events = self.pull_halo_events(since, self.current_time)
 
             print('[lambda_handler] Number of events: %d' % len(list_of_events))
 
             if len(list_of_events) > 0:
                 last_event_created_at = list_of_events[-1]['created_at']
 
-                for each in ordered_list_of_events:
+                for each in list_of_events:
                     sumologic_https_forwarder(self.sumo_url,
                                               json.dumps(each, ensure_ascii=False),
                                               self.max_retry)
@@ -58,14 +57,16 @@ class LambdaHandler():
 
         except botocore.exceptions.ClientError as e:
             if 'NonExistentQueue' in e.response['Error']['Code']:
-                response = q.create_queue(self.client, name=timestamp_queue, fifo='false')
-                enqueue(self.client, queue_url=response['QueueUrl'], message=self.current_time)
+                response = q.create_queue(self.client, name=self.timestamp_queue, fifo='false')
+                q.enqueue(self.client, queue_url=response['QueueUrl'], message=self.current_time)
 
         return self.current_time
 
+
 def main():
-  print('[CloudPassage Halo Events] Loading Lambda function - Get Since & Until timestamps')
-  lambda_handler = LambdaHandler()
+    print('[CloudPassage Halo Events] Loading Lambda function - Get Since & Until timestamps')
+    lambda_handler = LambdaHandler()
+    lambda_handler.run()
 
 if __name__ == "__mian__":
     main()
