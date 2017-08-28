@@ -31,11 +31,10 @@ class LambdaHandler():
         api = cloudpassage.HttpHelper(session)
         result = []
         for page in list(range(1, self.pages + 1)):
-            if self.time_elapsed() > self.timeout:
+            if self.time_elapsed() < self.timeout:
                 url = "/v1/events?page=%s&since=%s&until=%s" % (page, since, until)
                 data = api.get(url)
                 result.extend(data['events'])
-                break
         return result
 
     def run(self, event, context):
