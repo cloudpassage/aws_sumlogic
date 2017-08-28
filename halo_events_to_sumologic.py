@@ -60,14 +60,14 @@ class LambdaHandler():
                 response = q.create_queue(self.client, name=self.timestamp_queue, fifo='false')
                 q.enqueue(self.client, queue_url=response['QueueUrl'], message=self.current_time)
 
-        return last_event_created_at
+        return self.current_time
 
 
 def main(event, context):
     print('[CloudPassage Halo Events] Loading Lambda function - Get Since & Until timestamps')
     lambda_handler = LambdaHandler()
-    timestamp = lambda_handler.run('event', 'context')
-    return timestamp
+    current_time = lambda_handler.run('event', 'context')
+    return current_time
 
 if __name__ == "__main__":
     main('event', 'context')
