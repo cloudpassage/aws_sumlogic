@@ -66,8 +66,7 @@ class LambdaHandler():
 def main(event, context):
     print('[CloudPassage Halo Events] Loading Lambda function - Get Since & Until timestamps')
     lambda_handler = LambdaHandler()
-    current_time = lambda_handler.run('event', 'context')
-    return current_time
+    return lambda_handler.run('event', 'context')
 
 if __name__ == "__main__":
     main('event', 'context')
