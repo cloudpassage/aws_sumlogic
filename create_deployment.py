@@ -3,8 +3,17 @@ import subprocess
 import zipfile
 
 root_deployments_dir = "./deployments"
-# deployment_files = ['halo_events_to_sumologic.py', 'queue_utility.py', 'sumologic_https.py']
-deployment_files = ['halo_metrics_to_sumologic.py', 'metrics_utility.py', 'sumologic_https.py', 'timeout.py']
+deployment_files = [
+    'halo_events_to_sumologic.py',
+    'lib/queue_utility.py',
+    'lib/sumologic_https.py'
+]
+# deployment_files = [
+#     'halo_metrics_to_sumologic.py',
+#     'lib/metrics_utility.py',
+#     'lib/sumologic_https.py',
+#     'lib/timeout.py'
+# ]
 
 
 def _read_requirements():

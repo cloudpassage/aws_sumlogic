@@ -1,7 +1,7 @@
 import datetime
+import time
 from metrics_utility import MetricsUtility
 from timeout import Timeout
-import time
 
 
 class HaloMetrics():

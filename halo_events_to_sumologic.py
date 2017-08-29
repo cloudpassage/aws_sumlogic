@@ -3,9 +3,9 @@ import os
 import json
 import boto3
 import botocore
-from sumologic_https import sumologic_https_forwarder
 import cloudpassage
 import queue_utility as q
+from sumologic_https import sumologic_https_forwarder
 
 
 class LambdaHandler():
