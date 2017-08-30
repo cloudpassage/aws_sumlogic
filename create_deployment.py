@@ -22,16 +22,26 @@ class CreateDeployments(object):
 
     def get_immediate_subdirectories(self, a_dir):
         return [name for name in os.listdir(a_dir)
-                if os.path.isdir(os.path.join(a_dir, name))]
+                if os.path.isfile(os.path.join(a_dir, name))]
+
+    def remove_file_extension(self, filename):
+        if filename.endswith('.zip'):
+            return filename[:-4]
 
     def make_deployment_dir(self, name):
         all_deployment_directories = self.get_immediate_subdirectories(self.deployments_dir)
         max_deployment_number = -1
-        for deployment_dir in all_deployment_directories:
+        matching_dir = []
+        for directory in all_deployment_directories:
+            if name in directory:
+                matching_dir.append(directory)
+
+        for deployment_dir in matching_dir:
+            deployment_dir = self.remove_file_extension(deployment_dir)
+
             dir_name_elements = deployment_dir.split("_")
-            if( len(dir_name_elements) == 2):
-                if int(dir_name_elements[1]) > max_deployment_number:
-                    max_deployment_number = int(dir_name_elements[1])
+            if int(dir_name_elements[-1]) > max_deployment_number:
+                max_deployment_number = int(dir_name_elements[-1])
 
         if max_deployment_number == -1:
             max_deployment_number = 0
