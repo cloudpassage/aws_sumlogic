@@ -6,6 +6,7 @@ import botocore
 import cloudpassage
 import queue_utility as q
 from sumologic_https import sumologic_https_forwarder
+from timeout import Timeout
 
 
 class LambdaHandler():
@@ -16,25 +17,25 @@ class LambdaHandler():
         self.halo_api_endpoint = os.environ['halo_api_endpoint']
         self.aws_region_name = os.environ['aws_region_name']
         self.max_retry = 3
-        self.timeout = 240
+        self.t = Timeout(240)
         self.pages = 50
         self.client = boto3.client('sqs', region_name=self.aws_region_name)
         self.current_time = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         self.now = datetime.datetime.now()
         self.timestamp_queue = 'halo_last_time_ran-test'
 
-    def time_elapsed(self):
-        return (datetime.datetime.now() - self.now).seconds
-
     def pull_halo_events(self, since, until):
         session = cloudpassage.HaloSession(self.halo_api_key_id, self.halo_api_secret_key, api_host=self.halo_api_endpoint)
         api = cloudpassage.HttpHelper(session)
         result = []
-        for page in list(range(1, self.pages + 1)):
-            if self.time_elapsed() < self.timeout:
-                url = "/v1/events?page=%s&since=%s&until=%s" % (page, since, until)
-                data = api.get(url)
-                result.extend(data['events'])
+        try:
+            with self.t:
+                for page in list(range(1, self.pages + 1)):
+                    url = "/v1/events?page=%s&since=%s&until=%s" % (page, since, until)
+                    data = api.get(url)
+                    result.extend(data['events'])
+        except:
+            return result
         return result
 
     def run(self, event, context):
