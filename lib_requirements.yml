@@ -1,0 +1,12 @@
+modules:
+    halo_events_to_sumologic: [
+        'halo_events_to_sumologic.py',
+        'lib/queue_utility.py',
+        'lib/sumologic_https.py'
+    ]
+    halo_metrics_to_sumologic: [
+        'halo_metrics_to_sumologic.py',
+        'lib/metrics_utility.py',
+        'lib/sumologic_https.py',
+        'lib/timeout.py'
+    ]
