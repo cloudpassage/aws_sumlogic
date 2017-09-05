@@ -19,7 +19,7 @@ class HaloMetrics():
                 self.metrics_utility.sw_packages_summary()
                 self.metrics_utility.processes_summary()
                 self.metrics_utility.local_accounts_summary()
-                self.metrics_utility.sw_packages_summary()
+                self.metrics_utility.sw_vuln_summary()
         except:
             return self.current_time
         return self.current_time
